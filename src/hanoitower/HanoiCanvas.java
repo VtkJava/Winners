@@ -89,6 +89,9 @@ public class HanoiCanvas extends FigureCanvas {
     }
 
     public void loadDisk(int diskCount) {
+        if(this.disks.size() > 0) {
+            return;
+        }
         this.diskCount = diskCount;
 
         int diskHeight = ((peg1.getHeight() - 5) / diskCount);

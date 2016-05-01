@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Notepad/Notepad.iml" filepath="$PROJECT_DIR$/Notepad/Notepad.iml" />
       <module fileurl="file://$PROJECT_DIR$/Winners.iml" filepath="$PROJECT_DIR$/Winners.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
     </modules>

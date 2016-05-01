@@ -54,8 +54,10 @@ public class HanoiFrame extends JFrame {
 
     private void loadDiskPerformed(ActionEvent e) {
         int diskCount = Integer.parseInt(disksCountField.getText());
-        if(diskCount > 0 && diskCount < 60) {
+        if(diskCount > 0 && diskCount < 30) {
             canvas.loadDisk(diskCount);
+        } else {
+            JOptionPane.showMessageDialog(this,"Hanoi disks count must be less then 60");
         }
     }
 
