@@ -1,8 +1,10 @@
 package notepad;
 
-import util.BraceChecker;
 
+import util.BraceChecker;
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
@@ -12,11 +14,11 @@ import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
-
+import java.net.URL;
 import static notepad.Constants.*;
 
 
-public class NotepadeFrame extends JFrame implements ActionListener {
+public class NotepadeFrame extends JFrame implements ActionListener, CaretListener {
 
     final static String PROGRAM_NAME = "Notepad TT";
     final static String FILE_DEFAULT_NAME = "Untitled";
@@ -24,6 +26,7 @@ public class NotepadeFrame extends JFrame implements ActionListener {
     private JFileChooser fileChooser = new JFileChooser();
     private JPanel messagePanel = new JPanel();
     JTextField resultMessageField;
+    JTextField curetField;
 
     private File file;
     private static BraceChecker braceChecker = BraceChecker.getInstance();
@@ -39,7 +42,6 @@ public class NotepadeFrame extends JFrame implements ActionListener {
         super(frameTitle);
 
         menu = new NotepadeMenu();
-
         menu.getMiNew().addActionListener(this);
         menu.getMiOpen().addActionListener(this);
         menu.getMiSave().addActionListener(this);
@@ -74,14 +76,7 @@ public class NotepadeFrame extends JFrame implements ActionListener {
         scrollPane.getViewport().add(textArea);
         add(scrollPane, BorderLayout.CENTER);
 
-
-        resultMessageField = new JTextField();
-        resultMessageField.setForeground(Color.GREEN);
-        resultMessageField.setText("No Error");
-
-        messagePanel.add(resultMessageField);
-        messagePanel.setLayout(new GridLayout(1, 1));
-        add(messagePanel, BorderLayout.SOUTH);
+        setBottomPanel();
 
         this.highlighter = textArea.getHighlighter();
         this.painter = new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
@@ -106,7 +101,26 @@ public class NotepadeFrame extends JFrame implements ActionListener {
         setBounds(350, 350, 750, 500);
         setSize(750, 500);
 
+        //add icon
+        URL resource = getClass().getClassLoader().getResource("images/Notepad.png");
+        setIconImage(new ImageIcon(resource).getImage());
+
+        textArea.addCaretListener(this);
+
+        //set UI Manager
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
         setVisible(true);
+
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -114,6 +128,44 @@ public class NotepadeFrame extends JFrame implements ActionListener {
                 doFileClose();
             }
         });
+    }
+
+    public void caretUpdate(CaretEvent e)
+    {
+        try
+        {
+            int offset = textArea.getCaretPosition();
+            int line = textArea.getLineOfOffset(offset);
+            curetField.setText("Char "+ offset +" : line " + (line + 1));
+        }
+        catch (BadLocationException ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+    private void setBottomPanel(){
+
+        resultMessageField = new JTextField();
+        resultMessageField.setForeground(Color.GREEN);
+        resultMessageField.setText("No Error");
+
+        curetField = new JTextField();
+        curetField.setText("Char 1 : line 1");
+        messagePanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.8;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        messagePanel.add(resultMessageField, c);
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.2;
+        c.gridx = 1;
+        c.gridy = 0;
+        messagePanel.add(curetField, c);
+        add(messagePanel, BorderLayout.SOUTH);
     }
 
     public void parseText() {
@@ -342,8 +394,9 @@ public class NotepadeFrame extends JFrame implements ActionListener {
     }
 
     public int showSaveDialog() {
+        String filePath = file == null ? "" : file.getAbsolutePath();
         return JOptionPane.showOptionDialog(this.getContentPane(), "Do you want to save changes to" +
-                file.getAbsolutePath() + "?", PROGRAM_NAME, 0, JOptionPane.INFORMATION_MESSAGE, null, SAVE_DIALOG_OPTIONS, null);
+                filePath + "?", PROGRAM_NAME, 0, JOptionPane.INFORMATION_MESSAGE, null, SAVE_DIALOG_OPTIONS, null);
     }
 
 }
